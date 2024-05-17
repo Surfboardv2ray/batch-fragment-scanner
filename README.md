@@ -35,6 +35,7 @@ Edit the .ps1 file as the following:
 ✅ For example | for ($i = 0; $i -lt 10; $i++) {  runs 10 instances.
 
 5️⃣ Open Windows PowerShell as Admin
+
 Run PowerShell as admin and use `cd` command to navigate to your workspace folder:
 
 `cd C:\Workspaces`
