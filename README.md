@@ -11,6 +11,7 @@ Open Command prompt and type:
 If there are no errors and it displays the options for curl, it’s already installed on your Windows 10. Windows 10, version 1803 and later, includes a native curl.exe in C:\Windows\System32. If not, head to https://curl.se/ and install it. Make sure to add the downloaded curl.exe to your system’s PATH.
 
 2️⃣ Download Xray Core
+
 Downlaod xray.exe from the official [Github Repository](https://github.com/XTLS/Xray-core/releases) and put it in your workspace folder. Let's assume the Workspace folder is located at C:\Workspace
 
 3️⃣ Create a fragmented json config
