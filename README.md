@@ -3,7 +3,7 @@ Batch Test v2ray fragment values to see which one works best on your network.
 
 # How to - Windows 10
 
-1️⃣ Ensure `Curl` is installed. 
+1️⃣ Ensure "Curl" is installed. 
 Open Command prompt and type:
 
 `curl --version`
@@ -18,11 +18,17 @@ Create config.json, can be vmess, vless or trojan. Make sure it has "fragment" a
 
 4️⃣ Edit the PowerShell file
 Edit the .ps1 file as the following:
+
 ✴️ Edit $XRAY_PATH and point to your xray.exe path. 
+
 ✴️ Edit $CONFIG_PATH and point to your config.json
+
 ✴️ Edit $LOG_FILE and point to where you want the log file to be saved.
+
 ✴️ Edit the Arrays of possible values, based on your need. Values are used randomly in combination.
+
 ✴️ Edit instances to set the number of instances (random rounds of fragment value combinations) you want to run.
+
 ✅ For example | for ($i = 0; $i -lt 10; $i++) {  runs 10 instances.
 
 5️⃣ Open Windows PowerShell as Admin
