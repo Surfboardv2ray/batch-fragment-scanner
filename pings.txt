@@ -1,0 +1,70 @@
+Testing with packets=1-2, length=3-10, interval=10-20...
+2.0702597
+0.8844827
+0.8385991
+Average: 1.26444716666667 seconds
+
+
+Testing with packets=tlshello, length=1-5, interval=10-30...
+1.0156925
+1.1369625
+0.9906381
+Average: 1.04776436666667 seconds
+
+
+Testing with packets=1-2, length=10-30, interval=1-10...
+0.9314964
+0.9170945
+1.008436
+Average: 0.9523423 seconds
+
+
+Testing with packets=1-5, length=3-10, interval=1-5...
+0.8934487
+0.8450661
+0.9207477
+Average: 0.886420833333333 seconds
+
+
+Testing with packets=tlshello, length=10-20, interval=1-5...
+0.8732648
+0.8565925
+0.8558937
+Average: 0.861917 seconds
+
+
+Testing with packets=1-5, length=3-5, interval=1-1...
+0.8953951
+0.8952279
+0.9366478
+Average: 0.909090266666667 seconds
+
+
+Testing with packets=1-2, length=1-5, interval=10-20...
+0.8606542
+0.8913444
+0.9266832
+Average: 0.892893933333333 seconds
+
+
+Testing with packets=1-5, length=5-10, interval=1-10...
+1.1938321
+0.8301945
+0.8992303
+Average: 0.974418966666667 seconds
+
+
+Testing with packets=1-2, length=1-5, interval=5-10...
+0.8539884
+0.9134982
+0.9075698
+Average: 0.891685466666667 seconds
+
+
+Testing with packets=1-5, length=3-5, interval=3-10...
+1.0176239
+0.8539917
+0.9379354
+Average: 0.936517 seconds
+
+
