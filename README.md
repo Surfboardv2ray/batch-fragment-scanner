@@ -19,6 +19,7 @@ Downlaod xray.exe from the official [Github Repository](https://github.com/XTLS/
 Create config.json, can be vmess, vless or trojan. Make sure it has "fragment" attributes too, values don't matter (use tools like [IRCF Space](https://fragment.github1.cloud/) to create frag json config). Put it in the Workspace folder too.
 
 4️⃣ Edit the PowerShell file
+
 Edit the .ps1 file as the following:
 
 ✴️ Edit $XRAY_PATH and point to your xray.exe path. 
