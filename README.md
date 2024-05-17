@@ -15,6 +15,7 @@ If there are no errors and it displays the options for curl, it’s already inst
 Downlaod xray.exe from the official [Github Repository](https://github.com/XTLS/Xray-core/releases) and put it in your workspace folder. Let's assume the Workspace folder is located at C:\Workspace
 
 3️⃣ Create a fragmented json config
+
 Create config.json, can be vmess, vless or trojan. Make sure it has "fragment" attributes too, values don't matter (use tools like [IRCF Space](https://fragment.github1.cloud/) to create frag json config). Put it in the Workspace folder too.
 
 4️⃣ Edit the PowerShell file
