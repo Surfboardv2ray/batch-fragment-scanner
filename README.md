@@ -30,15 +30,22 @@ Edit the .ps1 file as the following:
 
 ✴️ Edit the Arrays of possible values, based on your need. Values are used randomly in combination.
 
-✴️ Edit instances to set the number of instances (random rounds of fragment value combinations) you want to run.
+✴️ Edit instances `-lt xx` to set the number of instances (random rounds of fragment value combinations) you want to run.
 
-✅ For example | for ($i = 0; $i -lt 10; $i++) {  runs 10 instances.
+✅ For example 
+
+    `for ($i = 0; $i -lt 10; $i++) {
+    $packets = Get-RandomValue -options $packetsOptions
+    $length = Get-RandomValue -options $lengthOptions
+    $interval = Get-RandomValue -options $intervalOptions`
+  
+  runs 10 instances (default is set to `10`)
 
 5️⃣ Open Windows PowerShell as Admin
 
 Run PowerShell as admin and use `cd` command to navigate to your workspace folder:
 
-`cd C:\Workspaces`
+`cd C:\Workspace`
 
 Then run the ps1 file:
 
