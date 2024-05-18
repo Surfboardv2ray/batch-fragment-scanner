@@ -28,7 +28,7 @@ Edit the .ps1 file as the following:
 
 ✴️ Edit $LOG_FILE and point to where you want the log file to be saved.
 
-✴️ Edit the Arrays of possible values, based on your need. Values are used randomly in combination.
+✴️ Edit the Arrays of possible values for packets, length, and interval based on your need. Values are used randomly in combination.
 
 ✴️ Edit instances `-lt xx` to set the number of instances (random rounds of fragment value combinations) you want to run.
 
