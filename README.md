@@ -30,14 +30,11 @@ Edit the .ps1 file as the following:
 
 ✴️ Edit the Arrays of possible values for packets, length, and interval based on your need. Values are used randomly in combination.
 
-✴️ Edit instances `-lt xx` to set the number of instances (random rounds of fragment value combinations) you want to run.
+✴️ Edit `$Instances` to set the number of instances (random rounds of fragment value combinations) you want to run.
 
 ✅ For example 
 
-    `for ($i = 0; $i -lt 10; $i++) {
-    $packets = Get-RandomValue -options $packetsOptions
-    $length = Get-RandomValue -options $lengthOptions
-    $interval = Get-RandomValue -options $intervalOptions`
+    `$Instances = 10`
   
   runs 10 instances (default is set to `10`)
 
@@ -58,4 +55,4 @@ Then run the ps1 file:
 and then type and send `y` to confirm. Now you can run the .ps1 file.
 
 
-🎆 After the code runs and finishes up, your logs will be saved at $LOG_FILE's path. The file contains response time with each fragment instance, with the average response time as well.
+🎆 After the code runs and finishes up, you'll get the top three (best) pings with their fragment values, and logs will be saved at $LOG_FILE's path. The file contains response time with each fragment instance, with the average response time as well.
