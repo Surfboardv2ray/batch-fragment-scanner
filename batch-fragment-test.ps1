@@ -5,9 +5,14 @@ $LOG_FILE = "C:/Workspace/pings.txt"
 
 # Arrays of possible values for packets, length, and interval
 $packetsOptions = @("tlshello", "1-2", "1-5")
-$lengthOptions = @("1-1", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-20", "10-30")
-$intervalOptions = @("1-1", "1-5", "3-5", "5-10", "10-20", "1-10", "3-10", "10-30")
+$lengthOptions = @("1-1", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-30", "10-20", "20-50", "50-100", "100-150")
+$intervalOptions = @("1-1", "1-5", "5-10", "10-20", "20-50", "40-50", "50-100", "100-150", "150-200", "100-200")
 
+# Number of instances to run
+$Instances = 10
+
+# Array to store top three lowest average response times
+$topThree = @()
 
 # Function to randomly select a value from an array
 function Get-RandomValue {
@@ -65,7 +70,7 @@ Start-Sleep -Seconds 10
 
 Clear-Content -Path $LOG_FILE
 
-for ($i = 0; $i -lt 10; $i++) {
+for ($i = 0; $i -lt $Instances; $i++) {
     $packets = Get-RandomValue -options $packetsOptions
     $length = Get-RandomValue -options $lengthOptions
     $interval = Get-RandomValue -options $intervalOptions
@@ -74,6 +79,29 @@ for ($i = 0; $i -lt 10; $i++) {
     $pingResult = Curl-Test -packets $packets -length $length -interval $interval
     Add-Content -Path $LOG_FILE -Value $pingResult
     Add-Content -Path $LOG_FILE -Value "`n"
+
+    # Extract average response time from the result
+    $averageResponseTime = ($pingResult -split "`n" | Where-Object { $_ -match "Average:" }) -replace "Average: " -replace " seconds", "" -as [double]
+
+    # Add the average response time along with fragment values to the top three list
+    $topThree += [PSCustomObject]@{
+        AverageResponseTime = $averageResponseTime
+        Packets = $packets
+        Length = $length
+        Interval = $interval
+    }
+}
+
+# Sort the top three list by average response time in ascending order
+$sortedTopThree = $topThree | Sort-Object -Property AverageResponseTime
+
+# Display the top three lowest average response times along with their corresponding fragment values
+Write-Host "Top three lowest average response times:"
+for ($i = 0; $i -lt 3; $i++) {
+    $item = $sortedTopThree[$i]
+    Write-Host "Average Response Time: $($item.AverageResponseTime) seconds"
+    Write-Host "Packets: $($item.Packets), Length: $($item.Length), Interval: $($item.Interval)"
+    Write-Host ""
 }
 
 Stop-Process -Name "xray" -Force
