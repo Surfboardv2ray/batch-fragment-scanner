@@ -1,5 +1,6 @@
 <h1 align="center">Batch Fragment Scanner</h1>
-Batch Test v2ray fragment values to see which one works best on your network.
+<h2 align="center">Batch Test v2ray fragment values to see which one works best on your network.</h2>
+
 
 ### 🌏 Readme in [Persian](https://telegra.ph/%D8%A7%D8%B3%DA%A9%D9%86%D8%B1-%D9%81%D8%B1%DA%AF%D9%85%D9%86%D8%AA-05-22)
 
