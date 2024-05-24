@@ -34,6 +34,8 @@ Edit the .ps1 file as the following:
 
 ✴️ Edit the Arrays of possible values for packets, length, and interval based on your need. Values are used randomly in combination.
 
+✴️ Edit `$TimeoutSec` to set the timeout for ping tests.
+
 ✴️ Edit `$Instances` to set the number of instances (random rounds of fragment value combinations) you want to run.
 
 ✅ For example 
