@@ -12,7 +12,7 @@ Open Command prompt and type:
 
 `curl --version`
 
-If there are no errors and it displays the options for curl, it’s already installed on your Windows 10. Windows 10, version 1803 and later, includes a native curl.exe in C:\Windows\System32. If not, head to https://curl.se/ and install it. Make sure to add the downloaded curl.exe to your system’s PATH.
+If there are no errors and it displays curl version, it’s already installed on your Windows 10. Windows 10 version 1803 and later, includes a native curl.exe in C:\Windows\System32. If not, head to https://curl.se/ and install it. Make sure to add the downloaded curl.exe to your system’s PATH.
 
 2️⃣ Download Xray Core
 
