@@ -43,25 +43,24 @@ function Curl-Test {
     for ($i = 0; $i -lt 3; $i++) {
         $startTime = Get-Date
         try {
-            # Perform the request using curl with SOCKS5 proxy
-            $response = Invoke-WebRequest -Uri "https://google.com/" -UseBasicParsing -TimeoutSec $timeout -Proxy "socks5://127.0.0.1:10808"
+            # Build the curl command with SOCKS5 proxy (HTTPS request)
+            $curlCommand = "curl --verbose --proxy SOCKS5://127.0.0.1:10808 --max-time $timeout https://google.com/"
+
+            # Execute the curl command through CMD and capture the output
+            $output = cmd.exe /c "$curlCommand"
 
             # Debug output
-            $headers = $response.Headers | Out-String
-            $content = $response.Content | Out-String
-
             Add-Content -Path $LOG_FILE -Value "Ping $($i + 1):"
-            Add-Content -Path $LOG_FILE -Value "Response Headers:`n$headers"
-            Add-Content -Path $LOG_FILE -Value "Response Content:`n$content"
+            Add-Content -Path $LOG_FILE -Value $output
 
-            # Check the HTTP status code
-            if ($response.StatusCode -eq 200) {
+            # Check for a successful response
+            if ($output -match "HTTP/\d+\.\d+\s+200\s+OK") {
                 $endTime = Get-Date
                 $responseTime = ($endTime - $startTime).TotalSeconds
                 $totalTime += $responseTime
                 $responseTimes += $responseTime
             } else {
-                $responseTimes += "Error: HTTP status code $($response.StatusCode)."
+                $responseTimes += "Error: Request failed."
             }
         } catch {
             $responseTimes += "Timeout: Request timed out."
@@ -78,6 +77,9 @@ function Curl-Test {
 
     return $responseTimes -join "`n"
 }
+
+
+
 
 # Function to modify config.json with random parameters
 function Modify-Config {
