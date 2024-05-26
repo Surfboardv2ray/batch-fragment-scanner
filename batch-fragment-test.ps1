@@ -20,12 +20,12 @@ if (-Not (Test-Path -Path $LOG_FILE)) {
 # Prompt user for input values with defaults
 $InstancesInput = Read-Host -Prompt "Enter the number of instances (default is 10)"
 $TimeoutSecInput = Read-Host -Prompt "Enter the timeout for each ping test in seconds (default is 10)"
-$HTTP_PROXY_PORTInput = Read-Host -Prompt "Enter the HTTP proxy port (default is 10809)"
+$HTTP_PROXY_PORTInput = Read-Host -Prompt "Enter the HTTP proxy port (default is 10808)"
 
 # Set default values if inputs are empty
 $Instances = if ($InstancesInput) { [int]$InstancesInput } else { 10 }
 $TimeoutSec = if ($TimeoutSecInput) { [int]$TimeoutSecInput } else { 10 }
-$HTTP_PROXY_PORT = if ($HTTP_PROXY_PORTInput) { [int]$HTTP_PROXY_PORTInput } else { 10809 }
+$HTTP_PROXY_PORT = if ($HTTP_PROXY_PORTInput) { [int]$HTTP_PROXY_PORTInput } else { 10808 }
 
 # HTTP Proxy server address
 $HTTP_PROXY_SERVER = "127.0.0.1"
@@ -129,8 +129,14 @@ function Send-HTTPRequest {
         Start-Sleep -Seconds 1
     }
 
-    # Calculate average ping time
-    $averagePing = if ($pingCount -eq 0) { 0 } else { $totalTime / $pingCount }
+    # Calculate average ping time, considering -1 as timeout
+    $validPings = $individualTimes | Where-Object { $_ -ne -1 }
+    if ($validPings.Count -gt 0) {
+        $totalValidTime = $validPings | Measure-Object -Sum | Select-Object -ExpandProperty Sum
+        $averagePing = ($totalValidTime + ($individualTimes.Count - $validPings.Count) * $timeout) / $pingCount
+    } else {
+        $averagePing = 0
+    }
 
     # Output the average ping time
     Write-Host "Average ping time: $averagePing ms"
@@ -158,7 +164,7 @@ for ($i = 0; $i -lt $Instances; $i++) {
 
     Start-Process -NoNewWindow -FilePath $XRAY_PATH -ArgumentList "-c $CONFIG_PATH"
 
-    Start-Sleep -Seconds 10
+    Start-Sleep -Seconds 3
 
     Add-Content -Path $LOG_FILE -Value "Testing with packets=$packets, length=$length, interval=$interval..."
     $averagePing = Send-HTTPRequest -pingCount 3
