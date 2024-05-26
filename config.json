@@ -8,7 +8,7 @@
   "inbounds": [
     {
       "tag": "socks",
-      "port": 10830,
+      "port": 10808,
       "listen": "127.0.0.1",
       "protocol": "socks",
       "sniffing": {
@@ -27,7 +27,7 @@
     },
     {
       "tag": "http",
-      "port": 10831,
+      "port": 10809,
       "listen": "127.0.0.1",
       "protocol": "http",
       "sniffing": {
