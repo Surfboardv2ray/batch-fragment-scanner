@@ -1,18 +1,39 @@
-# Path to the xray executable and config file
-$XRAY_PATH = "C:/Workspace/xray.exe"
-$CONFIG_PATH = "C:/Workspace/config.json"
-$LOG_FILE = "C:/Workspace/pings.txt"
+# Prompt the user to set the execution policy to Bypass
+$executionPolicyResponse = Read-Host "Set-ExecutionPolicy Bypass -Scope Process is required to run this script. Would you like to proceed? (Y/N)"
+if ($executionPolicyResponse -eq 'Y' -or $executionPolicyResponse -eq 'y') {
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+} else {
+    Write-Host "Execution policy not changed. Exiting script."
+    exit
+}
 
-# Timeout for each ping test in seconds
-$TimeoutSec = 5
+# Path to the xray executable and config file in the same folder as the script
+$XRAY_PATH = Join-Path -Path $PSScriptRoot -ChildPath "xray.exe"
+$CONFIG_PATH = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
+$LOG_FILE = Join-Path -Path $PSScriptRoot -ChildPath "pings.txt"
+
+# Create pings.txt if it does not exist
+if (-Not (Test-Path -Path $LOG_FILE)) {
+    New-Item -Path $LOG_FILE -ItemType File
+}
+
+# Prompt user for input values with defaults
+$InstancesInput = Read-Host -Prompt "Enter the number of instances (default is 10)"
+$TimeoutSecInput = Read-Host -Prompt "Enter the timeout for each ping test in seconds (default is 10)"
+$HTTP_PROXY_PORTInput = Read-Host -Prompt "Enter the HTTP proxy port (default is 10809)"
+
+# Set default values if inputs are empty
+$Instances = if ($InstancesInput) { [int]$InstancesInput } else { 10 }
+$TimeoutSec = if ($TimeoutSecInput) { [int]$TimeoutSecInput } else { 10 }
+$HTTP_PROXY_PORT = if ($HTTP_PROXY_PORTInput) { [int]$HTTP_PROXY_PORTInput } else { 10809 }
+
+# HTTP Proxy server address
+$HTTP_PROXY_SERVER = "127.0.0.1"
 
 # Arrays of possible values for packets, length, and interval
-$packetsOptions = @("tlshello", "1-2", "1-5")
-$lengthOptions = @("1-1", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-30", "10-20", "20-50", "50-100", "100-150")
-$intervalOptions = @("1-1", "1-5", "5-10", "10-20", "20-50", "40-50", "50-100", "100-150", "150-200", "100-200")
-
-# Number of instances to run
-$Instances = 10
+$packetsOptions = @("tlshello", "1-2", "1-3", "1-5")
+$lengthOptions = @("1-1", "1-2", "2-5,", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-30", "10-20", "20-50", "50-100", "100-150", "200-300")
+$intervalOptions = @("1-1", "1-2", "3-5", "1-5", "5-10", "10-15", "10-20", "20-30", "20-50", "40-50", "50-100", "50-80", "100-150", "150-200", "100-200", "200-300")
 
 # Array to store top three lowest average response times
 $topThree = @()
@@ -26,60 +47,6 @@ function Get-RandomValue {
     $randomIndex = Get-Random -Minimum 0 -Maximum $options.Length
     return $options[$randomIndex]
 }
-
-# Function to perform a curl test and log the response time
-function Curl-Test {
-    param (
-        [string]$packets,
-        [string]$length,
-        [string]$interval,
-        [int]$timeout
-    )
-
-    $responseTimes = @()
-    $totalTime = 0
-    $timeoutOccurred = $false
-
-    for ($i = 0; $i -lt 3; $i++) {
-        $startTime = Get-Date
-        try {
-            # Build the curl command with SOCKS5 proxy (HTTPS request)
-            $curlCommand = "curl --verbose --proxy SOCKS5://127.0.0.1:10808 --max-time $timeout https://google.com/"
-
-            # Execute the curl command through CMD and capture the output
-            $output = cmd.exe /c "$curlCommand"
-
-            # Debug output
-            Add-Content -Path $LOG_FILE -Value "Ping $($i + 1):"
-            Add-Content -Path $LOG_FILE -Value $output
-
-            # Check for a successful response
-            if ($output -match "HTTP/\d+\.\d+\s+200\s+OK") {
-                $endTime = Get-Date
-                $responseTime = ($endTime - $startTime).TotalSeconds
-                $totalTime += $responseTime
-                $responseTimes += $responseTime
-            } else {
-                $responseTimes += "Error: Request failed."
-            }
-        } catch {
-            $responseTimes += "Timeout: Request timed out."
-            $timeoutOccurred = $true
-        }
-    }
-
-    if ($timeoutOccurred) {
-        $responseTimes += "Average: Timeout"
-    } else {
-        $averageTime = $totalTime / 3
-        $responseTimes += "Average: $averageTime seconds"
-    }
-
-    return $responseTimes -join "`n"
-}
-
-
-
 
 # Function to modify config.json with random parameters
 function Modify-Config {
@@ -105,6 +72,76 @@ function Modify-Config {
     $config | ConvertTo-Json -Depth 100 | Set-Content -Path $CONFIG_PATH
 }
 
+# Function to stop the Xray process
+function Stop-XrayProcess {
+    try {
+        Stop-Process -Name "xray" -Force -ErrorAction Stop
+    } catch {
+        Write-Host "Xray process not found."
+    }
+}
+
+# Function to perform HTTP requests with proxy and measure response time
+function Send-HTTPRequest {
+    param (
+        [int]$pingCount,
+        [int]$timeout = $TimeoutSec * 1000  # Convert seconds to milliseconds
+    )
+
+    # Set the target URL
+    $url = "http://google.com"
+
+    # Initialize variables to store total time and count of pings
+    $totalTime = 0
+    $individualTimes = @()
+
+    # Ping three times and measure the time for each ping
+    for ($i = 1; $i -le $pingCount; $i++) {
+        # Create a WebRequest object
+        $request = [System.Net.HttpWebRequest]::Create($url)
+
+        # Set the timeout for the request
+        $request.Timeout = $timeout
+
+        # Set the proxy settings
+        $proxy = New-Object System.Net.WebProxy($HTTP_PROXY_SERVER, $HTTP_PROXY_PORT)
+        $request.Proxy = $proxy
+
+        Write-Host "Ping $($i):"
+        try {
+            $elapsedTime = Measure-Command {
+                # Send the HTTP request and get the response
+                $response = $request.GetResponse()
+            }
+
+            # Output the elapsed time in milliseconds
+            Write-Host "Elapsed time: $($elapsedTime.TotalMilliseconds) ms`n"
+
+            # Accumulate total time
+            $totalTime += $elapsedTime.TotalMilliseconds
+            $individualTimes += $elapsedTime.TotalMilliseconds
+        } catch {
+            Write-Host "Error: $($_.Exception.Message)"
+            $individualTimes += -1  # Mark failed requests with -1
+        }
+
+        # Add a 1-second delay between each ping
+        Start-Sleep -Seconds 1
+    }
+
+    # Calculate average ping time
+    $averagePing = if ($pingCount -eq 0) { 0 } else { $totalTime / $pingCount }
+
+    # Output the average ping time
+    Write-Host "Average ping time: $averagePing ms"
+
+    # Log individual ping times to pings.txt
+    Add-Content -Path $LOG_FILE -Value "Individual Ping Times:"
+    Add-Content -Path $LOG_FILE -Value ($individualTimes -join ",")
+
+    return $averagePing
+}
+
 # Main script
 # Clear the content of the log file before running the tests
 Clear-Content -Path $LOG_FILE
@@ -117,27 +154,19 @@ for ($i = 0; $i -lt $Instances; $i++) {
     Modify-Config -packets $packets -length $length -interval $interval
 
     # Stop Xray process if running
-    try {
-        Stop-Process -Name "xray" -Force -ErrorAction Stop
-    } catch {
-        Write-Host "Xray process not found, starting new instance."
-    }
+    Stop-XrayProcess
 
     Start-Process -NoNewWindow -FilePath $XRAY_PATH -ArgumentList "-c $CONFIG_PATH"
 
     Start-Sleep -Seconds 10
 
     Add-Content -Path $LOG_FILE -Value "Testing with packets=$packets, length=$length, interval=$interval..."
-    $pingResult = Curl-Test -packets $packets -length $length -interval $interval -timeout $TimeoutSec
-    Add-Content -Path $LOG_FILE -Value $pingResult
-    Add-Content -Path $LOG_FILE -Value "`n"
+    $averagePing = Send-HTTPRequest -pingCount 3
+    Add-Content -Path $LOG_FILE -Value "Average Ping Time: $averagePing ms`n"
 
-    # Extract average response time from the result
-    $averageResponseTime = ($pingResult -split "`n" | Where-Object { $_ -match "Average:" }) -replace "Average: " -replace " seconds", "" -as [double]
-
-    # Add the average response time along with fragment values to the top three list
+    # Add the average ping time along with fragment values to the top three list
     $topThree += [PSCustomObject]@{
-        AverageResponseTime = $averageResponseTime
+        AverageResponseTime = $averagePing
         Packets = $packets
         Length = $length
         Interval = $interval
@@ -147,24 +176,21 @@ for ($i = 0; $i -lt $Instances; $i++) {
     Start-Sleep -Seconds 1
 }
 
+# Filter out entries with an average response time of 0 ms
+$validResults = $topThree | Where-Object { $_.AverageResponseTime -gt 0 }
+
 # Sort the top three list by average response time in ascending order
-$sortedTopThree = $topThree | Sort-Object -Property AverageResponseTime
+$sortedTopThree = $validResults | Sort-Object -Property AverageResponseTime | Select-Object -First 3
 
 # Display the top three lowest average response times along with their corresponding fragment values
 Write-Host "Top three lowest average response times:"
-for ($i = 0; $i -lt 3; $i++) {
-    $item = $sortedTopThree[$i]
-    Write-Host "Average Response Time: $($item.AverageResponseTime) seconds"
+foreach ($item in $sortedTopThree) {
+    Write-Host "Average Response Time: $($item.AverageResponseTime) ms"
     Write-Host "Packets: $($item.Packets), Length: $($item.Length), Interval: $($item.Interval)"
-    Write-Host ""
 }
 
-# Display a message indicating that the tests have finished
-Write-Host "Ping tests completed. Results are logged in: $LOG_FILE"
+# Stop Xray process if running
+Stop-XrayProcess
 
-# Stop Xray process after all tests
-try {
-    Stop-Process -Name "xray" -Force
-} catch {
-    Write-Host "Xray process not found."
-}
+# Prevent the PowerShell window from closing immediately
+Read-Host -Prompt "Press Enter to exit the script..."
