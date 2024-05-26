@@ -18,7 +18,7 @@ Create config.json, can be vmess, vless or trojan. Make sure it has "fragment" a
 
 * Optional step: Edit the script for fragment values
 
-✴️ Edit the Arrays of possible values for packets, length, and interval based on your need. Values are used randomly in combination.
+✴️ Edit the .ps1 script at `Arrays of possible values` for "packets", "length", and "interval" based on your network. Values are used randomly in combination.
 
 
 * Open PowerShell script:
