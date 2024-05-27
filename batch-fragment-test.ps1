@@ -50,9 +50,9 @@ $HTTP_PROXY_PORT = if ($HTTP_PROXY_PORTInput) { [int]$HTTP_PROXY_PORTInput } els
 $HTTP_PROXY_SERVER = "127.0.0.1"
 
 # Arrays of possible values for packets, length, and interval
-$packetsOptions = @("tlshello", "1-2", "1-3", "1-5")
-$lengthOptions = @("1-1", "1-2", "2-5", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-30", "10-20", "20-50", "50-100", "100-150", "200-300")
-$intervalOptions = @("1-1", "1-2", "3-5", "1-5", "5-10", "10-15", "10-20", "20-30", "20-50", "40-50", "50-100", "50-80", "100-150", "150-200", "100-200", "200-300")
+$packetsOptions = @("1-1", "1-2", "1-3", "1-5")
+$lengthOptions = @("1-1", "1-2", "1-3", "2-5", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-30", "10-20", "20-50", "50-100", "100-150")
+$intervalOptions = @("1-1", "1-2", "3-5", "1-5", "5-10", "10-15", "10-20", "20-30", "20-50", "40-50", "50-100", "50-80", "100-150", "150-200", "100-200")
 
 # Array to store top three lowest average response times
 $topThree = @()
