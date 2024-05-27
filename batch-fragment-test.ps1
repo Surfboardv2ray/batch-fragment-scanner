@@ -12,7 +12,6 @@ if ($osVersion.Major -eq 10) {
     exit
 }
 
-
 # Path to the xray executable and config file in the same folder as the script
 $XRAY_PATH = Join-Path -Path $PSScriptRoot -ChildPath "xray.exe"
 $CONFIG_PATH = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
@@ -33,7 +32,8 @@ if (-Not (Test-Path -Path $XRAY_LOG_FILE)) {
     New-Item -Path $XRAY_LOG_FILE -ItemType File
 }
 
-# Clear the content of xraylogs.txt before running the tests
+# Clear the content of the log files before running the tests
+Clear-Content -Path $LOG_FILE
 Clear-Content -Path $XRAY_LOG_FILE
 
 # Prompt user for input values with defaults
@@ -160,8 +160,9 @@ function Send-HTTPRequest {
 }
 
 # Main script
-# Clear the content of the log file before running the tests
+# Clear the content of the log files before running the tests
 Clear-Content -Path $LOG_FILE
+Clear-Content -Path $XRAY_LOG_FILE
 
 # Create a table header
 $tableHeader = @"
@@ -192,6 +193,15 @@ for ($i = 0; $i -lt $Instances; $i++) {
     $averagePing = Send-HTTPRequest -pingCount 3
     Add-Content -Path $LOG_FILE -Value "Average Ping Time: $averagePing ms`n"
 
+    # Add the average ping time along with fragment values to the top three list
+    $topThree += [PSCustomObject]@{
+        Instance            = $i + 1
+        Packets             = $packets
+        Length              = $length
+        Interval            = $interval
+        AverageResponseTime = $averagePing
+    }
+
     # Display the results in table format
     $averagePingRounded = "{0:N2}" -f $averagePing
     $tableRow = @"
@@ -209,6 +219,16 @@ $tableFooter = @"
 "@
 # Write the table footer to the console
 Write-Host $tableFooter
+
+# Filter out entries with an average response time of 0 ms
+$validResults = $topThree | Where-Object { $_.AverageResponseTime -gt 0 }
+
+# Sort the top three list by average response time in ascending order
+$sortedTopThree = $validResults | Sort-Object -Property AverageResponseTime | Select-Object -First 3
+
+# Display the top three lowest average response times along with their corresponding fragment values
+Write-Host "Top three lowest average response times:"
+$sortedTopThree | Format-Table -Property Instance, Packets, Length, Interval, @{Name='AverageResponseTime (ms)';Expression={[math]::Round($_.AverageResponseTime, 2)}}
 
 # Stop Xray process if running
 Stop-XrayProcess
