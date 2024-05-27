@@ -89,7 +89,7 @@ function Send-HTTPRequest {
     )
 
     # Set the target URL
-    $url = "http://google.com"
+    $url = "http://cp.cloudflare.com"
 
     # Initialize variables to store total time and count of pings
     $totalTime = 0
