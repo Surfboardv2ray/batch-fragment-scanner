@@ -1,11 +1,17 @@
-# Prompt the user to set the execution policy to Bypass
-$executionPolicyResponse = Read-Host "Set-ExecutionPolicy Bypass -Scope Process is required to run this script. Would you like to proceed? (Y/N)"
-if ($executionPolicyResponse -eq 'Y' -or $executionPolicyResponse -eq 'y') {
+# Check if running on Windows 10 or Windows 11
+$osVersion = [System.Environment]::OSVersion.Version
+
+if ($osVersion.Major -eq 10) {
+    # For Windows 10, set execution policy to Bypass
     Set-ExecutionPolicy Bypass -Scope Process -Force
+} elseif ($osVersion.Major -eq 11) {
+    # For Windows 11, set execution policy to RemoteSigned
+    Set-ExecutionPolicy RemoteSigned -Scope Process -Force
 } else {
-    Write-Host "Execution policy not changed. Exiting script."
+    Write-Host "Unsupported version of Windows. Exiting script."
     exit
 }
+
 
 # Path to the xray executable and config file in the same folder as the script
 $XRAY_PATH = Join-Path -Path $PSScriptRoot -ChildPath "xray.exe"
@@ -26,6 +32,9 @@ if (-Not (Test-Path -Path $LOG_FILE)) {
 if (-Not (Test-Path -Path $XRAY_LOG_FILE)) {
     New-Item -Path $XRAY_LOG_FILE -ItemType File
 }
+
+# Clear the content of xraylogs.txt before running the tests
+Clear-Content -Path $XRAY_LOG_FILE
 
 # Prompt user for input values with defaults
 $InstancesInput = Read-Host -Prompt "Enter the number of instances (default is 10)"
@@ -150,11 +159,9 @@ function Send-HTTPRequest {
     return $averagePing
 }
 
-
 # Main script
 # Clear the content of the log file before running the tests
 Clear-Content -Path $LOG_FILE
-Clear-Content -Path $XRAY_LOG_FILE
 
 # Create a table header
 $tableHeader = @"
@@ -185,15 +192,6 @@ for ($i = 0; $i -lt $Instances; $i++) {
     $averagePing = Send-HTTPRequest -pingCount 3
     Add-Content -Path $LOG_FILE -Value "Average Ping Time: $averagePing ms`n"
 
-    # Add the average ping time along with fragment values to the top three list
-    $topThree += [PSCustomObject]@{
-        Instance          = $i + 1
-        Packets           = $packets
-        Length            = $length
-        Interval          = $interval
-        AverageResponseTime = $averagePing
-    }
-
     # Display the results in table format
     $averagePingRounded = "{0:N2}" -f $averagePing
     $tableRow = @"
@@ -211,17 +209,6 @@ $tableFooter = @"
 "@
 # Write the table footer to the console
 Write-Host $tableFooter
-
-# Filter out entries with an average response time of 0 ms
-$validResults = $topThree | Where-Object { $_.AverageResponseTime -gt 0 }
-
-# Sort the top three list by average response time in ascending order
-$sortedTopThree = $validResults | Sort-Object -Property AverageResponseTime | Select-Object -First 3
-
-# Display the top three lowest average response times along with their corresponding fragment values
-Write-Host "Top three lowest average response times:"
-$sortedTopThree | Format-Table -Property Instance, Packets, Length, Interval, @{Name='AverageResponseTime (ms)';Expression={[math]::Round($_.AverageResponseTime, 2)}}
-
 
 # Stop Xray process if running
 Stop-XrayProcess
