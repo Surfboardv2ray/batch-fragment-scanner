@@ -24,8 +24,6 @@ $CONFIG_PATH = "$CONFIG_PATH"
 $LOG_FILE = "$LOG_FILE"
 $XRAY_LOG_FILE = "$XRAY_LOG_FILE"
 
-
-
 # Check if xray.exe exists
 if (-Not (Test-Path -Path $XRAY_PATH)) {
     Write-Host "Error: xray.exe not found"
@@ -64,6 +62,16 @@ $packetsOptions = @("1-1", "1-2", "1-3", "1-5")
 $lengthOptions = @("1-1", "1-2", "1-3", "2-5", "1-5", "1-10", "3-5", "5-10", "3-10", "10-15", "10-30", "10-20", "20-50", "50-100", "100-150")
 $intervalOptions = @("1-1", "1-2", "3-5", "1-5", "5-10", "10-15", "10-20", "20-30", "20-50", "40-50", "50-100", "50-80", "100-150", "150-200", "100-200")
 
+# Calculate the maximum possible instances
+$maxPossibleInstances = $packetsOptions.Count * $lengthOptions.Count * $intervalOptions.Count
+
+# Validate user input for instances against the maximum possible instances
+while ($Instances -gt $maxPossibleInstances) {
+    Write-Host "Error: Number of instances cannot be greater than the maximum possible instances ($maxPossibleInstances)"
+    $InstancesInput = Read-Host -Prompt "Enter the number of instances (default is 10)"
+    $Instances = if ($InstancesInput) { [int]$InstancesInput } else { 10 }
+}
+
 # Array to store top three lowest average response times
 $topThree = @()
 
@@ -82,7 +90,6 @@ function Get-UniqueCombination {
     $combination = $null
     $usedCombinations = New-Object System.Collections.ArrayList
 
-
     do {
         $packets = Get-RandomValue -options $packetsOptions
         $length = Get-RandomValue -options $lengthOptions
@@ -92,7 +99,6 @@ function Get-UniqueCombination {
     } while ($usedCombinations -contains $combination)
 
     [void]$usedCombinations.Add($combination)
-
 
     return $packets, $length, $interval
 }
@@ -217,7 +223,6 @@ for ($i = 0; $i -lt $Instances; $i++) {
 
     # Start Xray process and redirect output to xraylogs.txt
     Start-Process -NoNewWindow -FilePath "$XRAY_PATH" -ArgumentList "-c `"$CONFIG_PATH`"" -RedirectStandardOutput "$XRAY_LOG_FILE" -RedirectStandardError "$XRAY_LOG_FILE.Error"
-
 
     Start-Sleep -Seconds 3
 
