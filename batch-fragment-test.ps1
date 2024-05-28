@@ -18,6 +18,14 @@ $CONFIG_PATH = Join-Path -Path $PSScriptRoot -ChildPath "config.json"
 $LOG_FILE = Join-Path -Path $PSScriptRoot -ChildPath "pings.txt"
 $XRAY_LOG_FILE = Join-Path -Path $PSScriptRoot -ChildPath "xraylogs.txt"
 
+# Enclose paths with spaces in double quotes
+$XRAY_PATH = "$XRAY_PATH"
+$CONFIG_PATH = "$CONFIG_PATH"
+$LOG_FILE = "$LOG_FILE"
+$XRAY_LOG_FILE = "$XRAY_LOG_FILE"
+
+
+
 # Check if xray.exe exists
 if (-Not (Test-Path -Path $XRAY_PATH)) {
     Write-Host "Error: xray.exe not found"
@@ -67,6 +75,26 @@ function Get-RandomValue {
 
     $randomIndex = Get-Random -Minimum 0 -Maximum $options.Length
     return $options[$randomIndex]
+}
+
+# Function to generate a unique combination of packets, length, and interval values
+function Get-UniqueCombination {
+    $combination = $null
+    $usedCombinations = New-Object System.Collections.ArrayList
+
+
+    do {
+        $packets = Get-RandomValue -options $packetsOptions
+        $length = Get-RandomValue -options $lengthOptions
+        $interval = Get-RandomValue -options $intervalOptions
+
+        $combination = "$packets,$length,$interval"
+    } while ($usedCombinations -contains $combination)
+
+    [void]$usedCombinations.Add($combination)
+
+
+    return $packets, $length, $interval
 }
 
 # Function to modify config.json with random parameters
@@ -180,9 +208,7 @@ $tableHeader = @"
 Write-Host $tableHeader
 
 for ($i = 0; $i -lt $Instances; $i++) {
-    $packets = Get-RandomValue -options $packetsOptions
-    $length = Get-RandomValue -options $lengthOptions
-    $interval = Get-RandomValue -options $intervalOptions
+    $packets, $length, $interval = Get-UniqueCombination
 
     Modify-Config -packets $packets -length $length -interval $interval
 
@@ -190,7 +216,8 @@ for ($i = 0; $i -lt $Instances; $i++) {
     Stop-XrayProcess
 
     # Start Xray process and redirect output to xraylogs.txt
-    Start-Process -NoNewWindow -FilePath $XRAY_PATH -ArgumentList "-c $CONFIG_PATH" -RedirectStandardOutput $XRAY_LOG_FILE -RedirectStandardError "$XRAY_LOG_FILE.Error"
+    Start-Process -NoNewWindow -FilePath "$XRAY_PATH" -ArgumentList "-c `"$CONFIG_PATH`"" -RedirectStandardOutput "$XRAY_LOG_FILE" -RedirectStandardError "$XRAY_LOG_FILE.Error"
+
 
     Start-Sleep -Seconds 3
 
