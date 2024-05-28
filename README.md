@@ -33,6 +33,8 @@ Create `config.json`, can be vmess, vless or trojan. Make sure it has "fragment"
 
 ✅ Enter HTTP Listening port. This depends on your json config. The deafault is 10809.
 
+✅ Enter number of requests per instance, i.e how many times a fragment set of values should be tested.
+
 🎆 After the code runs and finishes up, you'll get the top three (best) pings with their fragment values, and logs will be saved to `pings.txt`. The file contains response time with each fragment instance, with the average response time as well.
 
 🎆 Xray Core Logs are saved separately to `xraylogs.txt` so be sure to check it out after the run for detailed info and possible errors.
