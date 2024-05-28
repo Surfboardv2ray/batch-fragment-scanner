@@ -3,10 +3,10 @@ $osVersion = [System.Environment]::OSVersion.Version
 
 if ($osVersion.Major -eq 10) {
     # For Windows 10, set execution policy to Bypass
-    Set-ExecutionPolicy Bypass -Scope Process -Force
+    Set-ExecutionPolicy Bypass -Scope Process
 } elseif ($osVersion.Major -eq 11) {
     # For Windows 11, set execution policy to RemoteSigned
-    Set-ExecutionPolicy RemoteSigned -Scope Process -Force
+    Set-ExecutionPolicy RemoteSigned -Scope Process
 } else {
     Write-Host "Unsupported version of Windows. Exiting script."
     exit
