@@ -39,5 +39,6 @@ Create `config.json`, can be vmess, vless or trojan. Make sure it has "fragment"
 
 🎆 Xray Core Logs are saved separately to `xraylogs.txt` so be sure to check it out after the run for detailed info and possible errors.
 
+![0](https://raw.githubusercontent.com/Ptechgithub/configs/main/media/line.gif)
 ## Stargazers
 [![Stargazers over time](https://starchart.cc/Surfboardv2ray/batch-fragment-scanner.svg?variant=adaptive)](https://starchart.cc/Surfboardv2ray/batch-fragment-scanner)
