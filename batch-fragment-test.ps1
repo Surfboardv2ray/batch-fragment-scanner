@@ -40,11 +40,13 @@ Clear-Content -Path $XRAY_LOG_FILE
 $InstancesInput = Read-Host -Prompt "Enter the number of instances (default is 10)"
 $TimeoutSecInput = Read-Host -Prompt "Enter the timeout for each ping test in seconds (default is 10)"
 $HTTP_PROXY_PORTInput = Read-Host -Prompt "Enter the HTTP Listening port (default is 10809)"
+$PingCountInput = Read-Host -Prompt "Enter the number of requests per instance (default is 3)"
 
 # Set default values if inputs are empty
 $Instances = if ($InstancesInput) { [int]$InstancesInput } else { 10 }
 $TimeoutSec = if ($TimeoutSecInput) { [int]$TimeoutSecInput } else { 10 }
 $HTTP_PROXY_PORT = if ($HTTP_PROXY_PORTInput) { [int]$HTTP_PROXY_PORTInput } else { 10809 }
+$PingCount = if ($PingCountInput) { [int]$PingCountInput + 1 } else { 4 }  # Add 1 to the user input to account for the extra request
 
 # HTTP Proxy server address
 $HTTP_PROXY_SERVER = "127.0.0.1"
@@ -114,7 +116,7 @@ function Send-HTTPRequest {
     $totalTime = 0
     $individualTimes = @()
 
-    # Ping three times and measure the time for each ping
+    # Ping the specified number of times and measure the time for each ping
     for ($i = 1; $i -le $pingCount; $i++) {
         # Create a WebRequest object
         $request = [System.Net.HttpWebRequest]::Create($url)
@@ -143,11 +145,14 @@ function Send-HTTPRequest {
         Start-Sleep -Seconds 1
     }
 
+    # Skip the first ping result
+    $individualTimes = $individualTimes[1..($individualTimes.Count - 1)]
+
     # Calculate average ping time, considering -1 as timeout
     $validPings = $individualTimes | Where-Object { $_ -ne -1 }
     if ($validPings.Count -gt 0) {
         $totalValidTime = $validPings | Measure-Object -Sum | Select-Object -ExpandProperty Sum
-        $averagePing = ($totalValidTime + ($individualTimes.Count - $validPings.Count) * $timeout) / $pingCount
+        $averagePing = ($totalValidTime + ($individualTimes.Count - $validPings.Count) * $timeout) / ($pingCount - 1)
     } else {
         $averagePing = 0
     }
@@ -190,7 +195,7 @@ for ($i = 0; $i -lt $Instances; $i++) {
     Start-Sleep -Seconds 3
 
     Add-Content -Path $LOG_FILE -Value "Testing with packets=$packets, length=$length, interval=$interval..."
-    $averagePing = Send-HTTPRequest -pingCount 3
+    $averagePing = Send-HTTPRequest -pingCount $PingCount
     Add-Content -Path $LOG_FILE -Value "Average Ping Time: $averagePing ms`n"
 
     # Add the average ping time along with fragment values to the top three list
