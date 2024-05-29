@@ -31,7 +31,7 @@ Create `config.json`, can be vmess, vless or trojan. Make sure it has "fragment"
 
 ✅ Enter the timeout for each ping test, i.e amount of time the test will wait for response.
 
-✅ Enter HTTP Listening port. This depends on your json config. The deafault is 10809.
+✅ Enter HTTP Listening port. This depends on your json config. Default is 10809.
 
 ✅ Enter number of requests per instance, i.e how many times a fragment set of values should be tested.
 
