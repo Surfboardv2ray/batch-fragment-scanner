@@ -5,6 +5,8 @@
 * ### [Android Termux/Linux](https://github.com/Ptechgithub/FragmentScanner) Version by PTech
 <h2></h2>
 
+![0](https://raw.githubusercontent.com/Ptechgithub/configs/main/media/line.gif)
+
 ## How to - Windows 10
 
 * Ensure v2rayN is closed
