@@ -23,12 +23,12 @@ Create `config.json`, can be vmess, vless or trojan. Make sure it has "fragment"
 
 * Optional step: Edit the script for fragment values
 
-✴️ Edit the .ps1 script at `Arrays of possible values` for "packets", "length", and "interval" based on your network. Values are used randomly in combination.
+✴️ Only if you desire, edit the .ps1 script at `Arrays of possible values` for "packets", "length", and "interval" based on your network. Values are used randomly in combination.
 
 
 * Run PowerShell script:
 
-🧧 Confirm the Execution policy bypass via typing and sending `y` to run the script.
+🧧 Right click and run the ps1 file with PowerShell. Confirm the Execution policy bypass via typing and sending `y` to run the script.
 
 ✅ Enter number of instances, i.e the rounds of random combination of fragment values.
 
