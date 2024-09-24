@@ -1,6 +1,11 @@
 <h1 align="center">Batch Fragment Scanner</h1>
 <h2 align="center">Batch Test v2ray fragment values to see which one works best on your network.</h2>
 
+[![Version](https://img.shields.io/github/v/release/surfboardv2ray/batch-fragment-test?label=Version&color=blue)](https://github.com/surfboardv2ray/batch-fragment-test/releases/latest)
+[![Download](https://img.shields.io/github/downloads/surfboardv2ray/batch-fragment-test/total?label=Downloads)](https://github.com/surfboardv2ray/batch-fragment-test/releases/latest)
+[![Stars](https://img.shields.io/github/stars/surfboardv2ray/batch-fragment-test?style=flat&label=Stars&color=tomato
+)](https://github.com/surfboardv2ray/batch-fragment-test)
+
 * ### راهنمای [🇮🇷 فارسی](https://telegra.ph/%D8%A7%D8%B3%DA%A9%D9%86%D8%B1-%D9%81%D8%B1%DA%AF%D9%85%D9%86%D8%AA-05-27)
 * ### [Android Termux/Linux](https://github.com/Ptechgithub/FragmentScanner) Version by P-Tech
 * ### [YouTube Video](https://www.youtube.com/watch?v=wL3-bRxM_2o) Instructions by V2rayIrani
